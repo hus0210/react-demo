@@ -10,19 +10,9 @@ const tailLayout = {
 };
 
 export default class LoginForm extends React.Component {
-    onFinish(values) {
-        console.log('Success:', values);
-    }
-
-    onFinishFailed(errorInfo) {
-        console.log('Failed:', errorInfo);
-    }
-
     render() {
         return (
-            <Form name="loginForm" {...layout} initialValues={{ remember: true, }}
-                onFinish={this.onFinish} onFinishFailed={this.onFinishFailed}
-            >
+            <Form name="loginForm" {...layout} initialValues={{ remember: true, }} onFinish={this.props.onFinish} onFinishFailed={this.props.onFinishFailed}>
                 <Form.Item label="Username" name="username" rules={[{ required: true, message: 'Please input your username!'}]} >
                     <Input />
                 </Form.Item>

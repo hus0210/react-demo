@@ -1,9 +1,9 @@
 import React from 'react';
 import LoginForm from '../../components/loginForm/loginForm.jsx'
 
-export default class Login extends React.Component {
+export default class SignIn extends React.Component {
     onFinish(values) {
-        console.log('Success:', values);
+        console.log('Success:', this.props.match.params.class);
     }
 
     onFinishFailed(errorInfo) {
