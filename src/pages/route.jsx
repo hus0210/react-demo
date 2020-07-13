@@ -1,7 +1,7 @@
 import React from 'react';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import Login from './login/login.jsx'
-import Index from './index/index.jsx'
+import Index from './home/home.jsx'
 import SignIn from './signin/signin.jsx'
 
 export default class Router extends React.Component {
