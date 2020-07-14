@@ -1,4 +1,5 @@
 import React from 'react';
+import './home.css'
 import { Row, Col, Calendar, Badge, Modal } from 'antd';
 
 export default class Home extends React.Component {
@@ -37,17 +38,23 @@ export default class Home extends React.Component {
 
     dateCellRender(value) {
         var listData = this.getListData(value);
-        return (
-            <Modal title="Detail" visible={this.state.visible[value]}>
-                <ul className="events">
-                    {listData.map(item => (
-                        <li key={item.content}>
-                            <Badge status={item.type} text={item.content} />
-                        </li>
-                    ))}
-                </ul>
-            </Modal>
-        );
+
+        if (listData.length !== 0) {
+            return (
+                <>
+                    <Badge status='success'/>
+                    <Modal title="Detail" visible={this.state.visible[value]}>
+                        <ul className="events">
+                            {listData.map(item => (
+                                <li key={item.content}>
+                                    <Badge status={item.type} text={item.content} />
+                                </li>
+                            ))}
+                        </ul>
+                    </Modal>
+                </>
+            );
+        }
     }
 
     onSelect(value) {
