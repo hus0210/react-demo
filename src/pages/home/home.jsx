@@ -54,6 +54,12 @@ export default class Home extends React.Component {
                     </Modal>
                 </>
             );
+        } else {
+            return (
+                <>
+                    <Badge />
+                </>
+            );
         }
     }
 
