@@ -7,6 +7,7 @@ help:
 .PHONY: dep
 dep:
 	@npm install
+	@npm audit fix
 
 .PHONY: run
 run:

@@ -5,12 +5,14 @@ import { Row, Col } from 'antd';
 
 export default class Login extends React.Component {
     onFinish(values) {
-        console.log('Success:', values);
+        fetch(process.env.REACT_APP_BASE_URL).then(function(res){
+            console.log(values, res)
+        })
         this.props.history.push('/home')
     }
 
     onFinishFailed(errorInfo) {
-        console.log('Failed:', errorInfo);
+        console.log('Failed:', errorInfo, );
     }
 
     render() {
