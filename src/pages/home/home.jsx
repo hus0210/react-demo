@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Modal } from 'antd';
+import { Row, Col, Calendar, Modal } from 'antd';
 
 export default class Home extends React.Component {
     state = { visible: false, data: 123};
@@ -25,14 +25,18 @@ export default class Home extends React.Component {
 
     render() {
         return (
-            <div>
-                <Calendar fullscreen={false} onPanelChange={this.onPanelChange.bind(this)} onSelect={this.onSelect.bind(this)} />
-                <Modal title="Basic Modal" visible={this.state.visible} onOk={this.handleOk.bind(this)} onCancel={this.handleCancel.bind(this)}>
-                    <p>Some contents...</p>
-                    <p>Some contents...</p>
-                    <p>Some contents...</p>
-                </Modal>
-            </div>
+            <>
+                <Row type="flex" justify="center" style={{ minHeight: '100vh' }}>
+                    <Col span={24}>
+                        <Calendar fullscreen={false} onPanelChange={this.onPanelChange.bind(this)} onSelect={this.onSelect.bind(this)} />
+                        <Modal title="Basic Modal" visible={this.state.visible} onOk={this.handleOk.bind(this)} onCancel={this.handleCancel.bind(this)}>
+                            <p>Some contents...</p>
+                            <p>Some contents...</p>
+                            <p>Some contents...</p>
+                        </Modal>
+                    </Col>
+                </Row>
+            </>
         );
     }
 }
