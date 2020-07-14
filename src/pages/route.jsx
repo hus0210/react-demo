@@ -7,13 +7,15 @@ import SignIn from './signin/signin.jsx'
 export default class Router extends React.Component {
     render() {
         return (
-            <BrowserRouter>
-                <Switch>
-                    <Route exact path="/" component={Login} />
-                    <Route exact path="/home" component={Home} />
-                    <Route exact path="/signin/:class" component={SignIn} />
-                </Switch>
-            </BrowserRouter>
+            <>
+                <BrowserRouter>
+                    <Switch>
+                        <Route exact path="/" component={Login} />
+                        <Route exact path="/home" component={Home} />
+                        <Route exact path="/signin/:class" component={SignIn} />
+                    </Switch>
+                </BrowserRouter>
+            </>
         )
     }
 }

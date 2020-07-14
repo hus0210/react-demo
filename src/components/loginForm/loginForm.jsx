@@ -1,32 +1,33 @@
 import React from 'react';
-import { Form, Input, Button } from 'antd';
+import './loginForm.css'
+import { Form, Input, Button, Checkbox } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
-const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 8 },
-};
-const tailLayout = {
-    wrapperCol: { offset: 8, span: 16 },
-};
 
 export default class LoginForm extends React.Component {
     render() {
         return (
-                <Form name="loginForm" {...layout} initialValues={{ remember: true, }} onFinish={this.props.onFinish} onFinishFailed={this.props.onFinishFailed}>
-                    <Form.Item label="Username" name="username" rules={[{ required: true, message: 'Please input your username!' }]} >
-                        <Input />
-                    </Form.Item>
+            <Form name="loginForm" initialValues={{ remember: true, }} onFinish={this.props.onFinish} onFinishFailed={this.props.onFinishFailed}>
+                <Form.Item name="username" rules={[{ required: true, message: 'Please input your username!' }]} >
+                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
+                </Form.Item>
 
-                    <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please input your password!' },]}>
-                        <Input.Password />
-                    </Form.Item>
+                <Form.Item name="password" rules={[{ required: true, message: 'Please input your password!' },]}>
+                    <Input prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Password"/>
+                </Form.Item>
 
-                    <Form.Item {...tailLayout}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
+                <Form.Item>
+                    <Form.Item name="remember" valuePropName="checked" noStyle>
+                        <Checkbox>Remember me</Checkbox>
+                    </Form.Item>
+                </Form.Item>
+
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" className="login-form-button">
+                        Log in
                     </Button>
-                    </Form.Item>
-                </Form>
+                </Form.Item>
+            </Form>
         );
     }
 };
