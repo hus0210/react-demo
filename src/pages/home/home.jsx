@@ -1,39 +1,67 @@
 import React from 'react';
-import { Row, Col, Calendar, Modal } from 'antd';
+import { Row, Col, Calendar, Badge, Modal } from 'antd';
 
 export default class Home extends React.Component {
-    state = { visible: false, data: 123};
+    state = { visible: new Map() };
 
-    onPanelChange(value, mode) {
-        console.log(value.format('YYYY-MM-DD'), mode);
+    getListData(value) {
+        let listData;
+        switch (value.date()) {
+            case 8:
+                listData = [
+                    { type: 'warning', content: 'This is warning event.' },
+                    { type: 'success', content: 'This is usual event.' },
+                ];
+                break;
+            case 10:
+                listData = [
+                    { type: 'warning', content: 'This is warning event.' },
+                    { type: 'success', content: 'This is usual event.' },
+                    { type: 'error', content: 'This is error event.' },
+                ];
+                break;
+            case 15:
+                listData = [
+                    { type: 'warning', content: 'This is warning event' },
+                    { type: 'success', content: 'This is very long usual event。。....' },
+                    { type: 'error', content: 'This is error event 1.' },
+                    { type: 'error', content: 'This is error event 2.' },
+                    { type: 'error', content: 'This is error event 3.' },
+                    { type: 'error', content: 'This is error event 4.' },
+                ];
+                break;
+            default:
+        }
+        return listData || [];
     }
 
-    onSelect(date) {
-        this.setState({visible: true});
-        console.log(date)
+    dateCellRender(value) {
+        var listData = this.getListData(value);
+        return (
+            <Modal title="Detail" visible={this.state.visible[value]}>
+                <ul className="events">
+                    {listData.map(item => (
+                        <li key={item.content}>
+                            <Badge status={item.type} text={item.content} />
+                        </li>
+                    ))}
+                </ul>
+            </Modal>
+        );
     }
 
-    handleOk(e) {
-        console.log(e);
-        this.setState({visible: false});
-    };
-
-    handleCancel(e) {
-        console.log(e);
-        this.setState({visible: false});
-    };
+    onSelect(value) {
+        var visible = this.state.visible
+        visible[value] = !visible[value]
+        this.setState({ visible: visible })
+    }
 
     render() {
         return (
             <>
                 <Row type="flex" justify="center" style={{ minHeight: '100vh' }}>
                     <Col span={24}>
-                        <Calendar fullscreen={false} onPanelChange={this.onPanelChange.bind(this)} onSelect={this.onSelect.bind(this)} />
-                        <Modal title="Basic Modal" visible={this.state.visible} onOk={this.handleOk.bind(this)} onCancel={this.handleCancel.bind(this)}>
-                            <p>Some contents...</p>
-                            <p>Some contents...</p>
-                            <p>Some contents...</p>
-                        </Modal>
+                        <Calendar fullscreen={false} dateCellRender={this.dateCellRender.bind(this)} onSelect={this.onSelect.bind(this)} />
                     </Col>
                 </Row>
             </>
