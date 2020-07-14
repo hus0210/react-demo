@@ -25,12 +25,12 @@ export default class Login extends React.Component {
         return (
             <>
                 <Row type="flex" justify="center" align="middle" style={{ minHeight: '100vh' }}>
-                    <Col span={9}></Col>
-                    <Col span={6} value={120}>
+                    <Col xs={2} sm={4} md={6} lg={8} xl={10} ></Col>
+                    <Col xs={20} sm={16} md={12} lg={8} xl={4}>
                         <Title>FNST</Title>
                         <LoginForm onFinish={this.onFinish.bind(this)} onFinishFailed={this.onFinishFailed.bind(this)} />
                     </Col>
-                    <Col span={9}></Col>
+                    <Col xs={2} sm={4} md={6} lg={8} xl={10} ></Col>
                 </Row>
             </>
         );
