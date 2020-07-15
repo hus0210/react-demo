@@ -1,6 +1,6 @@
 import React from 'react';
 import './home.css'
-import { Row, Col, Typography, Button, Table, Space } from 'antd';
+import { Row, Col, Typography, Button, Table, Space, Modal } from 'antd';
 
 const { Title } = Typography;
 const { Column } = Table;
@@ -14,6 +14,7 @@ export default class Home extends React.Component {
                 type: "Group",
             },
         ],
+        visible: false,
     }
 
     expandedRowRender(record) {
@@ -30,26 +31,40 @@ export default class Home extends React.Component {
             }
         ]
 
-        return(
+        return (
             <Table dataSource={classDataSource} pagination={false}>
-                <Column title="Name" dataIndex="name" key="name"/>
-                <Column title="Detail" dataIndex="detail" key="detail"/>
+                <Column title="Name" dataIndex="name" key="name" />
+                <Column title="Detail" dataIndex="detail" key="detail" />
                 <Column title="Action" dataIndex="action" key="action" render={
-                    function (_, record){
-                        return(
+                    function (_, record) {
+                        return (
                             <Space size="middle">
                                 <Button type="primary" onClick={this.onEditClick.bind(this, record)}>Edit</Button>
                                 <Button type="primary" onClick={this.onDeleteClick.bind(this, record)}>Delete</Button>
+                                <Button type="primary" onClick={this.onGenClick.bind(this, record)}>Gen</Button>
                             </Space>
                         )
                     }.bind(this)
-                }/>
+                } />
             </Table>
         )
     }
 
     onNewClick() {
+        this.setState({ visible: true })
+    }
 
+    onNewOk() {
+        var dataSource = [...this.state.groupDataSource]
+        dataSource.push(
+            {
+                key: 1,
+                name: "1",
+                type: "Group",
+            },
+        )
+        console.log(dataSource)
+        this.setState({ visible: false, groupDataSource: dataSource })
     }
 
     onAddClick(record) {
@@ -61,6 +76,10 @@ export default class Home extends React.Component {
     }
 
     onDeleteClick(record) {
+        console.log(record)
+    }
+
+    onGenClick(record) {
         console.log(record)
     }
 
@@ -77,12 +96,12 @@ export default class Home extends React.Component {
                     <Col span={24}>
                         <Title>FNST</Title>
                     </Col>
-                    <Col type="flex" justify="center" align="right"span={23}>
+                    <Col type="flex" justify="center" align="right" span={23}>
                         <Button type="primary" onClick={this.onNewClick.bind(this)}>New</Button>
                     </Col>
                     <Col type="flex" justify="center" align="middle" span={24}>
                         <Table dataSource={this.state.groupDataSource} expandedRowRender={this.expandedRowRender.bind(this)} pagination={pagination}>
-                            <Column title="Name" dataIndex="name" key="name"/>
+                            <Column title="Name" dataIndex="name" key="name" />
                             <Column title="Action" dataIndex="action" key="action" render={
                                 function (_, record) {
                                     return (
@@ -92,8 +111,9 @@ export default class Home extends React.Component {
                                         </Space>
                                     )
                                 }.bind(this)
-                            }/>
+                            } />
                         </Table>
+                        <Modal visible={this.state.visible} onOk={this.onNewOk.bind(this)}></Modal>
                     </Col>
                 </Row>
             </>
