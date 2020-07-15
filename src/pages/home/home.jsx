@@ -45,7 +45,7 @@ export default class Home extends React.Component {
         if (data.length !== 0) {
             return (
                 <>
-                    <Badge status='success'/>
+                    <Badge status='success' />
                     <Modal title="Detail" visible={this.state.visible[value]}>
                         <ul className="events">
                             {data.map(item => (
@@ -68,7 +68,7 @@ export default class Home extends React.Component {
 
     onPanelChange() {
         this.firstSelect = true
-        this.setState({visible: new Map()})
+        this.setState({ visible: new Map() })
     }
 
     onSelect(value) {

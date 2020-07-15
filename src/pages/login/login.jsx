@@ -5,10 +5,10 @@ import { Row, Col } from 'antd';
 
 export default class Login extends React.Component {
     onFinish(values) {
-        fetch(process.env.REACT_APP_BASE_URL+"/login",{
+        fetch(process.env.REACT_APP_BASE_URL + "/login", {
             method: 'GET',
             mode: 'cors',
-        }).then(function(res){
+        }).then(function (res) {
             this.props.history.push('/home')
             console.log(values, res)
         }.bind(this))
@@ -21,10 +21,10 @@ export default class Login extends React.Component {
     render() {
         return (
             <>
-                <Row type="flex" justify="center" align="middle" style={{ minHeight: '100vh'}}>
+                <Row type="flex" justify="center" align="middle" style={{ minHeight: '100vh' }}>
                     <Col xs={2} sm={4} md={6} lg={8} xl={10} ></Col>
                     <Col xs={20} sm={16} md={12} lg={8} xl={4}>
-                        <LoginForm onFinish={this.onFinish.bind(this)} onFinishFailed={this.onFinishFailed.bind(this)}/>
+                        <LoginForm onFinish={this.onFinish.bind(this)} onFinishFailed={this.onFinishFailed.bind(this)} />
                     </Col>
                     <Col xs={2} sm={4} md={6} lg={8} xl={10} ></Col>
                 </Row>

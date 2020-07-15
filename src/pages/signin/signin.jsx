@@ -1,14 +1,12 @@
 import React from 'react';
 import './signin.css'
 import LoginForm from 'components/loginForm/loginForm.jsx'
-import { Row, Col, Typography, Result} from 'antd';
-
-const { Title } = Typography;
+import { Row, Col, Result } from 'antd';
 
 export default class SignIn extends React.Component {
     onFinish(values) {
-        console.log('Success:',values, this.props.match.params.class);
-        this.render = function() {
+        console.log('Success:', values, this.props.match.params.class);
+        this.render = function () {
             return (
                 <>
                     <Row type="flex" justify="center" align="middle" style={{ minHeight: '100vh' }}>
