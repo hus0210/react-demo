@@ -1,6 +1,6 @@
 import React from 'react';
 import './signin.css'
-import LoginForm from '../../components/loginForm/loginForm.jsx'
+import LoginForm from 'components/loginForm/loginForm.jsx'
 import { Row, Col, Typography, Result} from 'antd';
 
 const { Title } = Typography;
