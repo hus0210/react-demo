@@ -4,6 +4,7 @@ import { Row, Col, Calendar, Badge, Modal } from 'antd';
 
 export default class Home extends React.Component {
     state = { visible: new Map() };
+    firstSelect = false;
 
     getListData(value) {
         let listData;
@@ -37,15 +38,15 @@ export default class Home extends React.Component {
     }
 
     dateCellRender(value) {
-        var listData = this.getListData(value);
+        var data = this.getListData(value);
 
-        if (listData.length !== 0) {
+        if (data.length !== 0) {
             return (
                 <>
                     <Badge status='success'/>
                     <Modal title="Detail" visible={this.state.visible[value]}>
                         <ul className="events">
-                            {listData.map(item => (
+                            {data.map(item => (
                                 <li key={item.content}>
                                     <Badge status={item.type} text={item.content} />
                                 </li>
@@ -63,7 +64,16 @@ export default class Home extends React.Component {
         }
     }
 
+    onPanelChange() {
+        this.firstSelect = true
+        this.setState({visible: new Map()})
+    }
+
     onSelect(value) {
+        if (this.firstSelect === true) {
+            this.firstSelect = false
+            return
+        }
         var visible = this.state.visible
         visible[value] = !visible[value]
         this.setState({ visible: visible })
@@ -74,7 +84,7 @@ export default class Home extends React.Component {
             <>
                 <Row type="flex" justify="center" style={{ minHeight: '100vh' }}>
                     <Col span={24}>
-                        <Calendar fullscreen={false} dateCellRender={this.dateCellRender.bind(this)} onSelect={this.onSelect.bind(this)} />
+                        <Calendar fullscreen={false} dateCellRender={this.dateCellRender.bind(this)} onSelect={this.onSelect.bind(this)} onPanelChange={this.onPanelChange.bind(this)} />
                     </Col>
                 </Row>
             </>
