@@ -2,16 +2,8 @@ import React from 'react';
 import './home.css'
 import { Row, Col, Typography, Button, Table, Space } from 'antd';
 
-<<<<<<< HEAD
-export default class Home extends React.Component {
-    state = {
-        visible: new Map()
-    };
-    firstSelect = false;
-=======
 const { Title } = Typography;
 const { Column } = Table;
->>>>>>> update home page to admin
 
 export default class Home extends React.Component {
     state = {
