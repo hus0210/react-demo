@@ -1,92 +1,66 @@
 import React from 'react';
 import './home.css'
-import { Row, Col, Calendar, Badge, Modal } from 'antd';
+import { Row, Col, Typography, Button, Table } from 'antd';
 
+<<<<<<< HEAD
 export default class Home extends React.Component {
     state = {
         visible: new Map()
     };
     firstSelect = false;
+=======
+const { Title } = Typography;
+const { Column } = Table;
+>>>>>>> update home page to admin
 
-    getListData(value) {
-        let listData;
-        switch (value.date()) {
-            case 8:
-                listData = [
-                    { type: 'warning', content: 'This is warning event.' },
-                    { type: 'success', content: 'This is usual event.' },
-                ];
-                break;
-            case 10:
-                listData = [
-                    { type: 'warning', content: 'This is warning event.' },
-                    { type: 'success', content: 'This is usual event.' },
-                    { type: 'error', content: 'This is error event.' },
-                ];
-                break;
-            case 15:
-                listData = [
-                    { type: 'warning', content: 'This is warning event' },
-                    { type: 'success', content: 'This is very long usual event。。....' },
-                    { type: 'error', content: 'This is error event 1.' },
-                    { type: 'error', content: 'This is error event 2.' },
-                    { type: 'error', content: 'This is error event 3.' },
-                    { type: 'error', content: 'This is error event 4.' },
-                ];
-                break;
-            default:
-        }
-        return listData || [];
+export default class Home extends React.Component {
+    state = {
+        dataSource: [
+            {
+                key: 0,
+                name: "1",
+                type: "Group",
+                children: []
+            },
+        ]
     }
 
-    dateCellRender(value) {
-        var data = this.getListData(value);
+    onClick(value) {
 
-        if (data.length !== 0) {
-            return (
-                <>
-                    <Badge status='success'/>
-                    <Modal title="Detail" visible={this.state.visible[value]}>
-                        <ul className="events">
-                            {data.map(item => (
-                                <li key={item.content}>
-                                    <Badge status={item.type} text={item.content} />
-                                </li>
-                            ))}
-                        </ul>
-                    </Modal>
-                </>
-            );
-        } else {
-            return (
-                <>
-                    <Badge />
-                </>
-            );
-        }
     }
 
-    onPanelChange() {
-        this.firstSelect = true
-        this.setState({visible: new Map()})
-    }
-
-    onSelect(value) {
-        if (this.firstSelect === true) {
-            this.firstSelect = false
-            return
+    onExpand(expanded, record) {
+        if(expanded) {
+            var dataSource = this.state.dataSource
+            dataSource[record.key].children = [
+                {
+                    key: 0,
+                    name: "1",
+                    type: "Class",
+                }
+            ]
+            this.setState({
+                dataSource: dataSource
+            })
         }
-        var visible = this.state.visible
-        visible[value] = !visible[value]
-        this.setState({ visible: visible })
     }
 
     render() {
         return (
             <>
-                <Row type="flex" justify="center" style={{ minHeight: '100vh' }}>
+                <Row>
                     <Col span={24}>
-                        <Calendar fullscreen={false} dateCellRender={this.dateCellRender.bind(this)} onSelect={this.onSelect.bind(this)} onPanelChange={this.onPanelChange.bind(this)} />
+                        <Title>FNST</Title>
+                    </Col>
+                    <Col type="flex" justify="center" align="right"span={23}>
+                        <Button type="primary" onClick={this.onClick.bind(this)} >New</Button>
+                    </Col>
+                    <Col type="flex" justify="center" align="middle" span={24}>
+                        <Table dataSource={this.state.dataSource} onExpand={this.onExpand.bind(this)} >
+                            <Column title="Name" dataIndex="name" key="name" />
+                            <Column title="Type" dataIndex="type" key="type" />
+                            <Column title="action" dataIndex="action" key="action" />
+                        </Table>
                     </Col>
                 </Row>
             </>
