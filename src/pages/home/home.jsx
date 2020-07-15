@@ -3,7 +3,9 @@ import './home.css'
 import { Row, Col, Calendar, Badge, Modal } from 'antd';
 
 export default class Home extends React.Component {
-    state = { visible: new Map() };
+    state = {
+        visible: new Map()
+    };
     firstSelect = false;
 
     getListData(value) {
