@@ -4,5 +4,5 @@ import './index.css'
 import Router from 'pages/route.jsx'
 
 ReactDOM.render(
-    <Router/>,document.getElementById('root')
+    <Router />, document.getElementById('root')
 );

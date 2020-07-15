@@ -1,36 +1,122 @@
 import React from 'react';
 import './loginForm.css'
-import { Form, Input, Button, Checkbox } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Button, Table, Space, Modal } from 'antd';
+
+const { Title } = Typography;
+const { Column } = Table;
+
+export default class Home extends React.Component {
+    state = {
+        groupDataSource: [
+            {
+                key: 0,
+                name: "1",
+                type: "Group",
+            },
+        ],
+        visible: false,
+    }
+
+    expandedRowRender(record) {
+        var classDataSource = [
+            {
+                key: 0,
+                name: "11",
+                detail: "class 11"
+            },
+            {
+                key: 1,
+                name: "12",
+                detail: "class 12"
+            }
+        ]
+
+        return (
+            <Table dataSource={classDataSource} pagination={false}>
+                <Column title="Name" dataIndex="name" key="name" />
+                <Column title="Detail" dataIndex="detail" key="detail" />
+                <Column title="Action" dataIndex="action" key="action" render={
+                    function (_, record) {
+                        return (
+                            <Space size="middle">
+                                <Button type="primary" onClick={this.onEditClick.bind(this, record)}>Edit</Button>
+                                <Button type="primary" onClick={this.onDeleteClick.bind(this, record)}>Delete</Button>
+                                <Button type="primary" onClick={this.onGenClick.bind(this, record)}>Gen</Button>
+                            </Space>
+                        )
+                    }.bind(this)
+                } />
+            </Table>
+        )
+    }
+
+    onNewClick() {
+        this.setState({ visible: true })
+    }
+
+    onNewOk() {
+        var dataSource = [...this.state.groupDataSource]
+        dataSource.push(
+            {
+                key: 1,
+                name: "1",
+                type: "Group",
+            },
+        )
+        console.log(dataSource)
+        this.setState({ visible: false, groupDataSource: dataSource })
+    }
+
+    onAddClick(record) {
+        console.log(record)
+    }
+
+    onEditClick(record) {
+        console.log(record)
+    }
+
+    onDeleteClick(record) {
+        console.log(record)
+    }
+
+    onGenClick(record) {
+        console.log(record)
+    }
 
 
-export default class LoginForm extends React.Component {
+
     render() {
+        var pagination = {
+            current: 1,
+            pageSize: 10,
+        }
         return (
             <>
-                <img src={require("assets/images/fujitsu/logo.png")} alt="" />
-                <Form name="loginForm" initialValues={{ remember: true, }} onFinish={this.props.onFinish} onFinishFailed={this.props.onFinishFailed}>
-                    <Form.Item name="username" rules={[{ required: true, message: 'Please input your username!' }]} >
-                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
-                    </Form.Item>
-
-                    <Form.Item name="password" rules={[{ required: true, message: 'Please input your password!' },]}>
-                        <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Password" />
-                    </Form.Item>
-
-                    <Form.Item>
-                        <Form.Item name="remember" valuePropName="checked" noStyle>
-                            <Checkbox>Remember me</Checkbox>
-                        </Form.Item>
-                    </Form.Item>
-
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit" className="login-form-button">
-                            Log in
-                    </Button>
-                    </Form.Item>
-                </Form>
+                <Row>
+                    <Col span={24}>
+                        <Title>FNST</Title>
+                    </Col>
+                    <Col type="flex" justify="center" align="right" span={23}>
+                        <Button type="primary" onClick={this.onNewClick.bind(this)}>New</Button>
+                    </Col>
+                    <Col type="flex" justify="center" align="middle" span={24}>
+                        <Table dataSource={this.state.groupDataSource} expandedRowRender={this.expandedRowRender.bind(this)} pagination={pagination}>
+                            <Column title="Name" dataIndex="name" key="name" />
+                            <Column title="Action" dataIndex="action" key="action" render={
+                                function (_, record) {
+                                    return (
+                                        <Space size="middle">
+                                            <Button type="primary" onClick={this.onAddClick.bind(this, record)}>Add</Button>
+                                            <Button type="primary" onClick={this.onDeleteClick.bind(this, record)}>Delete</Button>
+                                        </Space>
+                                    )
+                                }.bind(this)
+                            } />
+                        </Table>
+                        <Modal visible={this.state.visible} onOk={this.onNewOk.bind(this)}></Modal>
+                    </Col>
+                </Row>
             </>
         );
     }
-};
+}
