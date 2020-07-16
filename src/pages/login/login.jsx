@@ -6,18 +6,17 @@ import Axios from 'axios'
 
 export default class Login extends React.Component {
     onFinish(values) {
-        Axios.post("/api/employee/login", {
+        Axios.post('/employee/login', {
             eName: values.username,
             ePwd: values.password,
         }).then(function (res) {
-            console.log(res)
-            if (res.message === "登陆成功") {
-                message.success("登陆成功")
-                this.props.history.push('/home')
-            } else if (res.message === "账号不存在") {
+            if (res.data.message === "登录成功") {
+                message.success("登录成功")
+                this.props.history.push('/home');
+            } else if (res.data.message === "账号不存在") {
                 message.error('账号不存在');
-            } else if (res.message === "秘密错误") {
-                message.error('秘密错误');
+            } else if (res.data.message === "密码错误") {
+                message.error('密码错误');
             } else {
                 message.error('未知错误');
             }
