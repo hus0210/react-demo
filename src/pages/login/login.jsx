@@ -1,17 +1,26 @@
 import React from 'react';
 import './login.css'
 import LoginForm from 'components/loginForm/loginForm.jsx'
-import { Row, Col } from 'antd';
+import { Row, Col, message } from 'antd';
 import Axios from 'axios';
 
 export default class Login extends React.Component {
     onFinish(values) {
-        Axios("/admin/login", {
+        Axios.post('/admin/login', {
             aId: values.username,
-            aPwd: values.password
+            aPwd: values.password,
         }).then(function (res) {
-            console.log(res)
-        })
+            if (res.data.message === "登录成功") {
+                message.success("登录成功")
+                this.props.history.push('/home');
+            } else if (res.data.message === "账号不存在") {
+                message.error('账号不存在');
+            } else if (res.data.message === "密码错误") {
+                message.error('密码错误');
+            } else {
+                message.error('未知错误');
+            }
+        }.bind(this))
     }
 
     render() {

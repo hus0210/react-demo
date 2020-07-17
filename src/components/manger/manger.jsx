@@ -1,6 +1,7 @@
 import React from 'react';
 import './manger.css'
-import { Row, Col, Button, Table, Space, Input, Modal, DatePicker, Checkbox } from 'antd';
+import { Row, Col, Button, Table, Space, Input, Modal, DatePicker, TimePicker, Checkbox, message } from 'antd';
+import Axios from 'axios';
 
 const { Column } = Table;
 
@@ -16,10 +17,12 @@ export default class Manger extends React.Component {
     }
     options = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     userInput = {
+        record: {},
         group: "",
         class: "",
         teacher: "",
         date: [],
+        time: [],
     }
 
     // group
@@ -33,12 +36,18 @@ export default class Manger extends React.Component {
 
     async onNewOk() {
         var dataSource = [...this.state.groupDataSource]
-        dataSource.push(
-            {
-                key: this.userInput.group,
-                group: this.userInput.group,
-            },
-        )
+        await Axios.post("/course/insertGroup", {
+            gName: this.userInput.group
+        }).then(function (res) {
+            message.success("Create group success")
+            dataSource.push(
+                {
+                    key: res.data.gId,
+                    no: res.data.gId,
+                    group: res.data.gName,
+                },
+            )
+        })
         this.setState({ newVisible: false, groupDataSource: dataSource })
     }
 
@@ -53,7 +62,8 @@ export default class Manger extends React.Component {
     }
 
     // class
-    onAddClick() {
+    onAddClick(record) {
+        this.userInput.record = record
         this.setState({ addVisible: true })
     }
 
@@ -67,6 +77,10 @@ export default class Manger extends React.Component {
 
     onAddDateChange(_, date) {
         this.userInput.date = date
+    }
+
+    onAddTimeChange(_, time) {
+        this.userInput.time = time
     }
 
     onAddCheckAllChange() {
@@ -88,9 +102,8 @@ export default class Manger extends React.Component {
         this.setState({ checkedList: checkedList })
     };
 
-    async onAddOk() {
-        var dataSource = [...this.state.classDataSource]
-        // Add to class list
+    onAddOk() {
+        // build ajax params
         var week = []
         this.options.forEach(item => {
             if (this.state.checkedList.indexOf(item) === -1) {
@@ -101,18 +114,41 @@ export default class Manger extends React.Component {
         });
         var start = new Date(this.userInput.date[0])
         var end = new Date(this.userInput.date[1])
+        var paramList = []
         for (; start <= end; start = new Date(start.setDate(start.getDate() + 1))) {
             if (week[start.getDay()]) {
-                dataSource.push({
-                    key: start.toLocaleDateString(),
-                    class: this.userInput.class,
-                    teacher: this.userInput.teacher,
-                    data: start.toLocaleDateString(),
+                paramList.push({
+                    cGroup: this.userInput.record.no,
+                    cName: this.userInput.record.group,
+                    cClass: this.userInput.class,
+                    cStart: this.userInput.date[0] + " " + this.userInput.time[0],
+                    cEnd: this.userInput.date[1] + " " + this.userInput.time[1],
+                    cTeacher: this.userInput.teacher,
                 })
             }
         }
-        // set state
-        this.setState({ addVisible: false, classDataSource: dataSource })
+        // send ajax request
+        Axios.post("/course/insertAllCourses", paramList).then(function (res) {
+            var dataSource = this.state.classDataSource
+            if (dataSource[this.userInput.record] === undefined) {
+                dataSource[this.userInput.record] = []
+            } else {
+                dataSource[this.userInput.record] = [...dataSource[this.userInput.record]]
+            }
+            // add to classDataSource
+            res.data.forEach(item => {
+                dataSource[this.userInput.record].push({
+                    key: item.cId,
+                    no: item.cId,
+                    class: item.data,
+                    teacher: item.cTeacher,
+                    start: item.cStart,
+                    end: item.cEnd
+                })
+            });
+            // set state
+            this.setState({ addVisible: false, classDataSource: dataSource })
+        }.bind(this))
     }
 
     onAddCancle() {
@@ -131,13 +167,14 @@ export default class Manger extends React.Component {
 
     // children table
     expandedRowRender(record) {
-        var classDataSource = this.state.classDataSource
+        console.log(this.state.classDataSource)
         return (
-            <Table dataSource={classDataSource} pagination={false}>
+            <Table dataSource={this.state.classDataSource[record]} pagination={false}>
                 <Column title="No" dataIndex="no" key="no" />
                 <Column title="Class" dataIndex="class" key="class" />
                 <Column title="Teacher" dataIndex="teacher" key="teacher" />
-                <Column title="Data" dataIndex="data" key="data" />
+                <Column title="Start" dataIndex="start" key="start" />
+                <Column title="End" dataIndex="end" key="end" />
                 <Column title="Action" dataIndex="action" key="action" render={
                     function (_, record) {
                         return (
@@ -153,6 +190,19 @@ export default class Manger extends React.Component {
     }
 
     render() {
+        if (this.state.groupDataSource.length === 0) {
+            Axios.post("/course/getAllGroup").then(function (res) {
+                var dataSource = [...this.state.groupDataSource]
+                res.data.forEach(item => {
+                    dataSource.push({
+                        key: item.gId,
+                        no: item.gId,
+                        group: item.gName
+                    })
+                });
+                this.setState({ groupDataSource: dataSource })
+            }.bind(this))
+        }
         var pagination = {
             current: 1,
             pageSize: 10,
@@ -169,17 +219,20 @@ export default class Manger extends React.Component {
                         <Column title="Action" dataIndex="action" key="action" render={
                             function (_, record) {
                                 return (
-                                    <Space size="middle">
-                                        <Button type="primary" onClick={this.onAddClick.bind(this, record)}>Add</Button>
-                                        <Button type="primary" onClick={this.onDeleteGroupClick.bind(this, record)}>Delete</Button>
-                                    </Space>
+                                    <>
+                                        <Space size="middle">
+                                            <Button type="primary" onClick={this.onAddClick.bind(this, record)}>Add</Button>
+                                            <Button type="primary" onClick={this.onDeleteGroupClick.bind(this, record)}>Delete</Button>
+                                        </Space>
+
+                                    </>
                                 )
                             }.bind(this)
                         } />
                     </Table>
                     <Modal title="New" visible={this.state.newVisible} onOk={this.onNewOk.bind(this)} onCancel={this.onNewCancle.bind(this)}>
                         <Input.Group compact>
-                            <Input disabled style={{ width: '30%' }} defaultValue='classgroup' />
+                            <Input disabled style={{ width: '30%' }} defaultValue='Group' />
                             <Input style={{ width: '70%' }}
                                 onChange={this.onNewChange.bind(this)}
                             />
@@ -187,24 +240,28 @@ export default class Manger extends React.Component {
                     </Modal>
                     <Modal title="Add" visible={this.state.addVisible} onOk={this.onAddOk.bind(this)} onCancel={this.onAddCancle.bind(this)}>
                         <Input.Group compact>
-                            <Input disabled style={{ width: '30%' }} defaultValue='class' />
+                            <Input disabled style={{ width: '30%' }} defaultValue='Class' />
                             <Input style={{ width: '70%' }}
                                 onChange={this.onAddClassChange.bind(this)}
                             />
-                            <Input disabled style={{ width: '30%' }} defaultValue='teacher' />
+                            <Input disabled style={{ width: '30%' }} defaultValue='Teacher' />
                             <Input style={{ width: '70%' }}
                                 onChange={this.onAddTeacherChange.bind(this)}
                             />
-                            <Input disabled style={{ width: '30%' }} defaultValue="data" />
+                            <Input disabled style={{ width: '30%' }} defaultValue="Date" />
                             <DatePicker.RangePicker style={{ width: '70%' }}
                                 onChange={this.onAddDateChange.bind(this)}
+                            />
+                            <Input disabled style={{ width: '30%' }} defaultValue="Time" />
+                            <TimePicker.RangePicker style={{ width: '70%' }}
+                                onChange={this.onAddTimeChange.bind(this)}
                             />
                             <div>
                                 <Checkbox indeterminate={this.state.indeterminate} checked={this.state.checkedAll}
                                     onChange={this.onAddCheckAllChange.bind(this)}
                                 >
                                     Check all
-                                </Checkbox>
+                                                </Checkbox>
                                 <br />
                                 <Checkbox.Group
                                     options={this.options}
