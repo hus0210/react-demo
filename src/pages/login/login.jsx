@@ -12,7 +12,7 @@ export default class Login extends React.Component {
         }).then(function (res) {
             if (res.data.message === "登录成功") {
                 message.success("登录成功")
-                this.props.history.push('/home');
+                this.props.history.push('/home/' + res.data.info.eId);
             } else if (res.data.message === "账号不存在") {
                 message.error('账号不存在');
             } else if (res.data.message === "密码错误") {

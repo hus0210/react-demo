@@ -15,16 +15,18 @@ export default class Home extends React.Component {
 
     async getData(date) {
         var list = []
+        var timestamp = (new Date(date)).valueOf();
         await Axios.post('/sign/showCourse/', {
             eId: parseInt(this.props.match.params.eid),
-            cStart: '2020-7-14',
+            cStart: new Date(date).toLocaleDateString().replace(/\//g, '-'),
+            cEnd: new Date(date).toLocaleDateString().replace(/\//g, '-'),
         }).then(function (res) {
             for (var i = 0; i < res.data.length; i++) {
-                var status = "warning";
+                var status = 'warning'
                 if (res.data[i].signState === 1) {
-                    status = "success"
-                } else {
-                    status = "error"
+                    status = 'success'
+                } else if ((new Date(res.data[i].course.cEnd)).valueOf() < timestamp) {
+                    status = 'error'
                 }
                 list.push({
                     status: status,
@@ -37,7 +39,7 @@ export default class Home extends React.Component {
 
     dateCellRender(date) {
         if (this.count++ < 42) {
-            this.getData().then(function (list) {
+            this.getData(date).then(function (list) {
                 var badges = this.state.badges
                 var visibles = this.state.visibles
                 if (list.length) {
@@ -64,7 +66,7 @@ export default class Home extends React.Component {
                     <ul className="events">
                         {this.state.list.map(item => (
                             <li key={item.text}>
-                                <Badge status={item.state} text={item.text} />
+                                <Badge status={item.status} text={item.text} />
                             </li>
                         ))}
                     </ul>
