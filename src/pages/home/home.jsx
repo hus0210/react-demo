@@ -1,10 +1,10 @@
 import React from 'react';
 import './home.css'
+import Statistics from 'components/statistics/statistics.jsx'
 import { Row, Col, Typography, Button, Table, Space, Input, Modal, DatePicker, Tabs } from 'antd';
 
 const { Title } = Typography;
 const { Column } = Table;
-
 const { TabPane } = Tabs;
 
 export default class Home extends React.Component {
@@ -210,12 +210,11 @@ export default class Home extends React.Component {
                                         </Col>
                                     </Row>
                                 </Modal>
-
                             </Col>
                         </Row>
                     </TabPane>
                     <TabPane tab="签到统计" key="2">
-
+                        <Statistics />
                     </TabPane>
                 </Tabs>
             </>
