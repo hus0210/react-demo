@@ -1,14 +1,18 @@
 import React from 'react';
 import './manger.css'
-import { Row, Col, Button, Table, Space, Input, Modal, DatePicker, TimePicker, Checkbox, message } from 'antd';
+import { Row, Col, Button, Popover, Table, Space, Input, Modal, DatePicker, TimePicker, Checkbox, message, Transfer } from 'antd';
+import QRCode from 'qrcode.react';
 import Axios from 'axios';
 
 const { Column } = Table;
 
 export default class Manger extends React.Component {
     state = {
-        groupDataSource: [],
-        classDataSource: [],
+        groupDataSource: [{ key: 0, group: "123" }, { key: 1, group: "1234" }],
+        classDataSource: new Map(),
+        userDataSource: [],
+        targetKeys: [],
+        selectedKeys: [],
         newVisible: false,
         addVisible: false,
         indeterminate: true,
@@ -64,6 +68,21 @@ export default class Manger extends React.Component {
     // class
     onAddClick(record) {
         this.userInput.record = record
+        Axios.post("").then(function (res) {
+            this.setState({ userDataSource: res.data })
+        }.bind(this))
+        this.setState({
+            userDataSource: [
+                {
+                    key: 0,
+                    eId: "1",
+                },
+                {
+                    key: 1,
+                    eId: "1",
+                },
+            ]
+        })
         this.setState({ addVisible: true })
     }
 
@@ -102,53 +121,73 @@ export default class Manger extends React.Component {
         this.setState({ checkedList: checkedList })
     };
 
+    onAddTransferChange(nextTargetKeys) {
+        this.setState({ targetKeys: nextTargetKeys })
+    }
+
+    onAddTransferSelectChange(sourceSelectedKeys, targetSelectedKeys) {
+        this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] });
+    }
+
     onAddOk() {
-        // build ajax params
-        var week = []
-        this.options.forEach(item => {
-            if (this.state.checkedList.indexOf(item) === -1) {
-                week.push(false)
-            } else {
-                week.push(true)
-            }
-        });
-        var start = new Date(this.userInput.date[0])
-        var end = new Date(this.userInput.date[1])
-        var paramList = []
-        for (; start <= end; start = new Date(start.setDate(start.getDate() + 1))) {
-            if (week[start.getDay()]) {
-                paramList.push({
-                    cGroup: this.userInput.record.no,
-                    cName: this.userInput.record.group,
-                    cClass: this.userInput.class,
-                    cStart: this.userInput.date[0] + " " + this.userInput.time[0],
-                    cEnd: this.userInput.date[1] + " " + this.userInput.time[1],
-                    cTeacher: this.userInput.teacher,
-                })
-            }
+        /* // build ajax params
+         var week = []
+         this.options.forEach(item => {
+             if (this.state.checkedList.indexOf(item) === -1) {
+                 week.push(false)
+             } else {
+                 week.push(true)
+             }
+         });
+         var start = new Date(this.userInput.date[0])
+         var end = new Date(this.userInput.date[1])
+         var paramList = []
+         for (; start <= end; start = new Date(start.setDate(start.getDate() + 1))) {
+             if (week[start.getDay()]) {
+                 paramList.push({
+                     cGroup: this.userInput.record.no,
+                     cName: this.userInput.record.group,
+                     cClass: this.userInput.class,
+                     cStart: this.userInput.date[0] + " " + this.userInput.time[0],
+                     cEnd: this.userInput.date[1] + " " + this.userInput.time[1],
+                     cTeacher: this.userInput.teacher,
+                 })
+             }
+         }
+         // send ajax request
+         Axios.post("/course/insertAllCourses", paramList).then(function (res) {
+             var dataSource = this.state.classDataSource
+             if (dataSource[this.userInput.record] === undefined) {
+                 dataSource[this.userInput.record] = []
+             } else {
+                 dataSource[this.userInput.record] = [...dataSource[this.userInput.record]]
+             }
+             // add to classDataSource
+             res.data.forEach(item => {
+                 dataSource[this.userInput.record].push({
+                     key: item.cId,
+                     no: item.cId,
+                     class: item.data,
+                     teacher: item.cTeacher,
+                     start: item.cStart,
+                     end: item.cEnd
+                 })
+             });
+             // set state
+             this.setState({ addVisible: false, classDataSource: dataSource })
+         }.bind(this))*/
+        var dataSource = this.state.classDataSource
+        if (dataSource[this.userInput.record] === undefined) {
+            dataSource[this.userInput.record] = []
+        } else {
+            dataSource[this.userInput.record] = [...dataSource[this.userInput.record]]
         }
-        // send ajax request
-        Axios.post("/course/insertAllCourses", paramList).then(function (res) {
-            var dataSource = this.state.classDataSource
-            if (dataSource[this.userInput.record] === undefined) {
-                dataSource[this.userInput.record] = []
-            } else {
-                dataSource[this.userInput.record] = [...dataSource[this.userInput.record]]
-            }
-            // add to classDataSource
-            res.data.forEach(item => {
-                dataSource[this.userInput.record].push({
-                    key: item.cId,
-                    no: item.cId,
-                    class: item.data,
-                    teacher: item.cTeacher,
-                    start: item.cStart,
-                    end: item.cEnd
-                })
-            });
-            // set state
-            this.setState({ addVisible: false, classDataSource: dataSource })
-        }.bind(this))
+        dataSource[this.userInput.record].push({
+            key: 0,
+            cId: 123,
+            class: 123,
+        })
+        this.setState({ addVisible: false, classDataSource: dataSource })
     }
 
     onAddCancle() {
@@ -180,7 +219,14 @@ export default class Manger extends React.Component {
                         return (
                             <Space size="middle">
                                 <Button type="primary" onClick={this.onDeleteClassClick.bind(this, record)}>Delete</Button>
-                                <Button type="primary" onClick={this.onGenClick.bind(this, record)}>Gen</Button>
+                                <Popover content={
+                                    <QRCode
+                                        value={record.cId}
+                                        size={300}
+                                        fgColor="#000000" />
+                                }>
+                                    <Button type="primary" onClick={this.onGenClick.bind(this, record)}>Gen</Button>
+                                </Popover>,
                             </Space>
                         )
                     }.bind(this)
@@ -224,7 +270,6 @@ export default class Manger extends React.Component {
                                             <Button type="primary" onClick={this.onAddClick.bind(this, record)}>Add</Button>
                                             <Button type="primary" onClick={this.onDeleteGroupClick.bind(this, record)}>Delete</Button>
                                         </Space>
-
                                     </>
                                 )
                             }.bind(this)
@@ -267,6 +312,17 @@ export default class Manger extends React.Component {
                                     options={this.options}
                                     value={this.state.checkedList}
                                     onChange={this.onAddCheckChange.bind(this)}
+                                />
+                            </div>
+                            <div>
+                                <Transfer dataSource={this.state.userDataSource} style={{ width: '100%' }}
+                                    onChange={this.onAddTransferChange.bind(this)}
+                                    targetKeys={this.state.targetKeys}
+                                    selectedKeys={this.state.selectedKeys}
+                                    onSelectChange={this.onAddTransferSelectChange.bind(this)}
+                                    titles={['From', 'To']}
+                                    render={item => item.eId}
+                                    oneWay
                                 />
                             </div>
                         </Input.Group>
