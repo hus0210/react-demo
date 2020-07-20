@@ -1,6 +1,7 @@
 import React from 'react';
 import './statistics.css'
 import { Row, Col, Button, Space, DatePicker, Select, Table } from 'antd';
+import Axios from 'axios';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -20,15 +21,26 @@ export default class Statistics extends React.Component {
 
     onChange(date, dateString) {
         console.log(date, dateString)
-        this.setState({ groupList: ["c1", "c2", "c3"], userList: ["u1", "u2", "u3"] })
     }
 
     onGroupSelectClick() {
-        this.setState({ groupList: ["c1", "c2", "c3"] })
+        Axios.post("/course/getAllGroup").then(function (res) {
+            var list = []
+            res.data.forEach(item => {
+                list[item.gId] = item.gName
+            });
+            this.setState({ groupList: list })
+        }.bind(this))
     }
 
     onUserSelectClick() {
-        this.setState({ userList: ["u1", "u2", "u3"] })
+        Axios.post("/course/getAllEmployee").then(function (res) {
+            var list = []
+            res.data.forEach(item => {
+                list[item.eId] = item.eName
+            });
+            this.setState({ userList: list })
+        }.bind(this))
     }
 
     render() {
