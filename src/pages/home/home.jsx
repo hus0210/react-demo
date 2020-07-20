@@ -7,14 +7,10 @@ import { Tabs } from 'antd';
 const { TabPane } = Tabs;
 
 export default class Home extends React.Component {
-    callback(key) {
-        console.log(key);
-    }
-
     render() {
         return (
             <>
-                <Tabs defaultActiveKey="1" size={"large"} onChange={this.callback.bind(this)}>
+                <Tabs defaultActiveKey="1" size={"large"}>
                     <TabPane tab="课程管理" key="1">
                         <Manger />
                     </TabPane>

@@ -14,13 +14,14 @@ export default class Statistics extends React.Component {
         userList: [],
     }
 
-    start = ""
-    end = ""
-    group = ""
-    user = ""
+    userInput = {
+        date: [],
+        gid: -1,
+        uid: -1,
+    }
 
-    onChange(date, dateString) {
-        console.log(date, dateString)
+    onChange(_, dateString) {
+        this.userInput.date = dateString
     }
 
     onGroupSelectClick() {
@@ -33,6 +34,10 @@ export default class Statistics extends React.Component {
         }.bind(this))
     }
 
+    onGroupSelectChange(value) {
+        this.userInput.gid = this.state.groupList.indexOf(value)
+    }
+
     onUserSelectClick() {
         Axios.post("/course/getAllEmployee").then(function (res) {
             var list = []
@@ -40,6 +45,28 @@ export default class Statistics extends React.Component {
                 list[item.eId] = item.eName
             });
             this.setState({ userList: list })
+        }.bind(this))
+    }
+
+    onUserSelectChange(value) {
+        this.userInput.uid = this.state.userList.indexOf(value)
+    }
+
+    onSearchClick() {
+        Axios.post('/sign/querySign', {
+            cGroup: this.userInput.gid,
+            eId: this.userInput.uid,
+            cStart: this.userInput.date[0] + " 00:00:00",
+            cEnd: this.userInput.date[1] + " 23:59:59",
+        }).then(function (res) {
+            var dataSource = []
+            dataSource.push({
+                key: 0,
+                total: res.data.courseNum,
+                current: res.data.attendNum,
+                percent: res.data.attendPercent,
+            })
+            this.setState({ dataSource: dataSource })
         }.bind(this))
     }
 
@@ -62,6 +89,7 @@ export default class Statistics extends React.Component {
                                     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                 }
                                 onClick={this.onGroupSelectClick.bind(this)}
+                                onChange={this.onGroupSelectChange.bind(this)}
                             >
                                 {this.state.groupList.map(item => (
                                     <Option key={item} value={item}>{item}</Option>
@@ -76,21 +104,20 @@ export default class Statistics extends React.Component {
                                     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                 }
                                 onClick={this.onUserSelectClick.bind(this)}
+                                onChange={this.onUserSelectChange.bind(this)}
                             >
                                 {this.state.userList.map(item => (
                                     <Option key={item} value={item}>{item}</Option>
                                 ))}
                             </Select>
-                            <Button type="primary">Search</Button>
+                            <Button type="primary" onClick={this.onSearchClick.bind(this)}>Search</Button>
                         </Space>
                     </Col>
                     <Col span={24}>
                         <Table dataSource={this.state.dataSource} pagination={pagination}>
-                            <Column title="Name" dataIndex="name" key="name" />
-                            <Column title="Start" dataIndex="start" key="start" />
-                            <Column title="End" dataIndex="end" key="end" />
-                            <Column title="Class" dataIndex="class" key="class" />
-                            <Column title="Teacher" dataIndex="teacher" key="teacher" />
+                            <Column title="Total" dataIndex="total" key="total" />
+                            <Column title="Current" dataIndex="current" key="current" />
+                            <Column title="Percent" dataIndex="percent" key="percent" />
                         </Table>
                     </Col>
                 </Row>

@@ -20,6 +20,7 @@ export default class Manger extends React.Component {
         checkedList: ["Mon", "Tue", "Wed", "Thu", "Fri"]
     }
     options = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    firstLoad = true
     userInput = {
         record: {},
         group: "",
@@ -38,12 +39,11 @@ export default class Manger extends React.Component {
         this.userInput.group = event.target.value
     }
 
-    async onNewOk() {
-        var dataSource = [...this.state.groupDataSource]
-        await Axios.post("/course/insertGroup", {
+    onNewOk() {
+        Axios.post("/course/insertGroup", {
             gName: this.userInput.group
         }).then(function (res) {
-            message.success("Create group success")
+            var dataSource = [...this.state.groupDataSource]
             dataSource.push(
                 {
                     key: res.data.gId,
@@ -51,8 +51,9 @@ export default class Manger extends React.Component {
                     group: res.data.gName,
                 },
             )
-        })
-        this.setState({ newVisible: false, groupDataSource: dataSource })
+            this.setState({ newVisible: false, groupDataSource: dataSource })
+            message.success("Create group success")
+        }.bind(this))
     }
 
     onNewCancle() {
@@ -153,8 +154,8 @@ export default class Manger extends React.Component {
                     cGroup: this.userInput.record.id,
                     cName: this.userInput.record.group,
                     cClass: this.userInput.class,
-                    cStart: this.userInput.date[0] + " " + this.userInput.time[0],
-                    cEnd: this.userInput.date[1] + " " + this.userInput.time[1],
+                    cStart: start.toLocaleDateString().replace(/\//g, '-') + " " + this.userInput.time[0],
+                    cEnd: start.toLocaleDateString().replace(/\//g, '-') + " " + this.userInput.time[1],
                     cTeacher: this.userInput.teacher,
                 })
             }
@@ -168,7 +169,7 @@ export default class Manger extends React.Component {
                     groupId: item.cGroup,
                     key: item.cId,
                     id: item.cId,
-                    class: item.data,
+                    class: item.cClass,
                     teacher: item.cTeacher,
                     start: item.cStart,
                     end: item.cEnd
@@ -178,8 +179,8 @@ export default class Manger extends React.Component {
             this.setState({ classDataSource: dataSource })
             // add user
             var paramList = []
-            this.state.selectedKeys.forEach(item => {
-                paramList.push(this.state.userDataSource[item].id)
+            this.state.targetKeys.forEach(item => {
+                paramList.push(this.state.userDataSource[item - 1].id)
             });
             Axios.post("/course/insertSign", {
                 cGroup: this.userInput.record.id,
@@ -241,12 +242,12 @@ export default class Manger extends React.Component {
                                 <Button type="primary" onClick={this.onDeleteClassClick.bind(this, record)}>Delete</Button>
                                 <Popover content={
                                     <QRCode
-                                        value={toString(record.id)}
+                                        value={process.env.REACT_APP_SIGNIN_URL + '/' + toString(record.id)}
                                         size={300}
                                         fgColor="#000000" />
                                 }>
                                     <Button type="primary" onClick={this.onGenClick.bind(this, record)}>Gen</Button>
-                                </Popover>,
+                                </Popover>
                             </Space>
                         )
                     }.bind(this)
@@ -260,13 +261,13 @@ export default class Manger extends React.Component {
             Axios.post('course/getCourseByGroup', {
                 cGroup: record.id,
             }).then(function (res) {
-                var dataSource = [...this.state.classDataSource]
+                var dataSource = []
                 res.data.forEach(item => {
                     dataSource.push({
                         groupId: record.id,
                         key: item.cId,
                         id: item.cId,
-                        class: item.class,
+                        class: item.cClass,
                         teacher: item.cTeacher,
                         start: item.cStart,
                         end: item.cEnd
@@ -278,7 +279,8 @@ export default class Manger extends React.Component {
     }
 
     render() {
-        if (this.state.groupDataSource.length === 0) {
+        if (this.firstLoad) {
+            this.firstLoad = false
             Axios.post("/course/getAllGroup").then(function (res) {
                 var dataSource = [...this.state.groupDataSource]
                 res.data.forEach(item => {
